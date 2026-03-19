@@ -792,6 +792,24 @@ Thank you for applying to the Jones Walker Pre-Law Scholarship. Your application
   </g>
 </svg>
         </div>
+        <div class="login-title">
+          <h1>Jones Walker Pre-Law Scholarship</h1>
+          <p>Committee Review Portal</p>
+        </div>
+        <div class="portal-field-group">
+          <label class="portal-field-label">Name</label>
+          <select class="portal-input" id="login-select">
+            <option value="">— Select your name —</option>
+          </select>
+        </div>
+        <div class="portal-field-group">
+          <label class="portal-field-label">Password</label>
+          <input class="portal-input" type="password" id="login-pw" placeholder="Enter password">
+        </div>
+        <div class="login-error" id="login-error"></div>
+        <button class="btn-primary" style="width:100%;padding:13px;margin-top:8px;font-size:14px;" onclick="doLogin()">Sign In</button>
+        <div class="portal-back-link"><a href="#" onclick="hidePortal(); return false;">← Back to scholarship page</a></div>
+      </div>
     </div>
 
     <!-- Info Screen (reviewers) -->
