@@ -1140,7 +1140,7 @@ function hidePortal() {
 // ============================================================
 
 // ── PASTE YOUR APPS SCRIPT URL HERE ──────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbxX4zDVJhZx-DCGCfRB14uViQWz5PnzZHEKK3d1IgR21Qgg5Z1m4qJEaIqg4vDXAcwq/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxTwb392OiUal0E5YGhN0LKq9V3ORiTIh_Ci-lPaTn6s6DwKf6F2x3y2WPMlROhddggqA/exec';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const STATE = {
@@ -1286,7 +1286,16 @@ function avgScoreForApplicant(applicantId) {
 async function initPortal() {
   showScreen('loading-screen');
   document.getElementById('loading-msg').textContent = 'Loading portal...';
-  await loadState();
+  try {
+    // 10 second timeout — if Apps Script doesn't respond, go to login anyway
+    await Promise.race([
+      loadState(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000))
+    ]);
+  } catch(err) {
+    console.warn('Portal load issue:', err);
+    // Still proceed — login screen will show, reviewers list may be empty
+  }
   populateLoginSelect();
   showScreen('login-screen');
 }
@@ -1299,6 +1308,11 @@ function showScreen(id) {
 function populateLoginSelect() {
   const sel = document.getElementById('login-select');
   sel.innerHTML = '<option value="">— Select your name —</option>';
+  if (STATE.reviewers.length === 0) {
+    // Fallback — hardcoded admin so portal is never completely locked out
+    sel.innerHTML += '<option value="admin">Josh (Admin)</option>';
+    STATE.reviewers = [{ id: 'admin', name: 'Josh', role: 'admin', password: 'admin2026' }];
+  }
   STATE.reviewers.forEach(r => {
     sel.innerHTML += `<option value="${r.id}">${r.name}</option>`;
   });
