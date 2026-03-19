@@ -1125,8 +1125,6 @@ document.getElementById('app-form').addEventListener('submit', async function(e)
 // ============================================================
 
 function showPortal() {
-  document.getElementById('public-site').style.display = 'none';
-  document.getElementById('review-portal').style.display = 'block';
   initPortal();
 }
 
@@ -1284,17 +1282,17 @@ function avgScoreForApplicant(applicantId) {
 // ============================================================
 
 async function initPortal() {
+  document.getElementById('public-site').style.display = 'none';
+  document.getElementById('review-portal').style.display = 'block';
   showScreen('loading-screen');
   document.getElementById('loading-msg').textContent = 'Loading portal...';
   try {
-    // 10 second timeout — if Apps Script doesn't respond, go to login anyway
     await Promise.race([
       loadState(),
       new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000))
     ]);
   } catch(err) {
     console.warn('Portal load issue:', err);
-    // Still proceed — login screen will show, reviewers list may be empty
   }
   populateLoginSelect();
   showScreen('login-screen');
