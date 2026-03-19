@@ -926,8 +926,7 @@ Thank you for applying to the Jones Walker Pre-Law Scholarship. Your application
         <!-- Applicants Tab -->
         <div id="tab-applicants">
           <div class="page-title">Applicants <span id="applicant-count" style="font-size:14px;font-weight:400;color:var(--text-light);"></span></div>
-          <div class="page-subtitle">Add applicants manually from the Google Sheet. Sorted by group — High School Seniors first, then Alumni.</div>
-          <button class="add-applicant-btn" onclick="openAddModal()">+ Add Applicant</button>
+          <div class="page-subtitle">Applicants are loaded automatically from the application form. Sorted by group — High School Seniors first, then Alumni.</div>
           <div id="applicant-list"></div>
         </div>
 
@@ -1752,10 +1751,6 @@ function renderReviewerMain(a) {
       <div class="applicant-card-body">
         ${a.legalArea ? `<div class="ac-section-title" style="margin-bottom:8px;">Intended Area</div><div style="font-size:15px;margin-bottom:20px;">${a.legalArea}</div>` : ''}
         ${a.essay ? `<div class="ac-section-title">Essay</div><div class="ac-essay">${a.essay.replace(/</g,'&lt;')}</div>` : '<div style="color:var(--text-light);font-size:14px;">No essay submitted yet.</div>'}
-        ${(a.resumeUrl || a.photoUrl) ? `<div class="ac-docs" style="margin-top:20px;">
-          ${a.resumeUrl ? `<a class="doc-btn" href="${a.resumeUrl}" target="_blank">📄 Résumé</a>` : ''}
-          ${a.photoUrl  ? `<a class="doc-btn" href="${a.photoUrl}"  target="_blank">📷 Headshot</a>` : ''}
-        </div>` : ''}
       </div>
     </div>
 
@@ -1772,6 +1767,11 @@ function renderReviewerMain(a) {
         ${existing.rubric && Object.keys(existing.rubric).length === RUBRIC.length ? 'Update Score' : 'Save Score'}
       </button>
       <div class="saved-msg" id="saved-msg">✓ Score saved</div>
+      ${(a.resumeUrl || a.photoUrl) ? `<div class="ac-docs" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--text-light);margin-bottom:10px;">Supporting Documents</div>
+        ${a.resumeUrl ? `<a class="doc-btn" href="${a.resumeUrl}" target="_blank" rel="noopener">📄 Open Résumé</a>` : ''}
+        ${a.photoUrl  ? `<a class="doc-btn" href="${a.photoUrl}"  target="_blank" rel="noopener">📷 Open Headshot</a>` : ''}
+      </div>` : ''}
     </div>
   `;
 }
