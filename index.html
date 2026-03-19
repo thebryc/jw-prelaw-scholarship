@@ -1139,6 +1139,10 @@ function hidePortal() {
 // REVIEW PORTAL STATE & STORAGE
 // ============================================================
 
+// ── PASTE YOUR APPS SCRIPT URL HERE ──────────────────────────────────────────
+const API_URL = 'https://script.google.com/macros/s/AKfycbxX4zDVJhZx-DCGCfRB14uViQWz5PnzZHEKK3d1IgR21Qgg5Z1m4qJEaIqg4vDXAcwq/exec';
+// ─────────────────────────────────────────────────────────────────────────────
+
 const STATE = {
   currentUser: null,
   applicants: [],
@@ -1149,37 +1153,38 @@ const STATE = {
   editApplicantId: null,
 };
 
-const STORAGE_KEY_APPLICANTS = 'jw-scholarship-applicants';
-const STORAGE_KEY_REVIEWERS  = 'jw-scholarship-reviewers';
-const STORAGE_KEY_REVIEWS    = 'jw-scholarship-reviews';
+async function apiGet(action) {
+  const res = await fetch(API_URL + '?action=' + action);
+  return res.json();
+}
 
-const DEFAULT_REVIEWERS = [
-  { id: 'admin', name: 'Admin', role: 'admin', password: 'admin2026' },
-  { id: 'reviewer1', name: 'Reviewer 1', role: 'reviewer', password: 'review2026' },
-  { id: 'reviewer2', name: 'Reviewer 2', role: 'reviewer', password: 'review2026' },
-];
+async function apiPost(body) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
 
 async function loadState() {
   try {
-    const [rA, rR, rRv] = await Promise.all([
-      window.storage.get(STORAGE_KEY_APPLICANTS).catch(() => null),
-      window.storage.get(STORAGE_KEY_REVIEWERS).catch(() => null),
-      window.storage.get(STORAGE_KEY_REVIEWS).catch(() => null),
-    ]);
-    STATE.applicants = rA ? JSON.parse(rA.value) : [];
-    STATE.reviewers  = rR ? JSON.parse(rR.value) : DEFAULT_REVIEWERS;
-    STATE.reviews    = rRv ? JSON.parse(rRv.value) : {};
-    if (!rR) await window.storage.set(STORAGE_KEY_REVIEWERS, JSON.stringify(DEFAULT_REVIEWERS));
-  } catch {
+    const data = await apiGet('getAll');
+    STATE.applicants = data.applicants || [];
+    STATE.reviewers  = data.reviewers  || [];
+    STATE.reviews    = data.reviews    || {};
+  } catch(err) {
+    console.error('Failed to load state:', err);
     STATE.applicants = [];
-    STATE.reviewers  = DEFAULT_REVIEWERS;
+    STATE.reviewers  = [];
     STATE.reviews    = {};
   }
 }
 
-async function saveApplicants() { await window.storage.set(STORAGE_KEY_APPLICANTS, JSON.stringify(STATE.applicants)); }
-async function saveReviewers()  { await window.storage.set(STORAGE_KEY_REVIEWERS,  JSON.stringify(STATE.reviewers)); }
-async function saveReviews()    { await window.storage.set(STORAGE_KEY_REVIEWS,    JSON.stringify(STATE.reviews)); }
+async function saveApplicants() { /* handled per-operation via apiPost */ }
+async function saveReviewers()  {
+  await apiPost({ action: 'saveReviewers', reviewers: STATE.reviewers });
+}
+async function saveReviews()    { /* handled per-operation via apiPost */ }
 
 // ============================================================
 // RUBRIC
@@ -1415,7 +1420,11 @@ async function saveLink(id, field, inputEl) {
   if (!val) return;
   inputEl.disabled = true;
   const a = STATE.applicants.find(x => x.id === id);
-  if (a) { a[field] = val; await saveApplicants(); renderApplicantList(); }
+  if (a) {
+    a[field] = val;
+    await apiPost({ action: 'saveLink', id, field, value: val });
+    renderApplicantList();
+  }
 }
 
 function openAddModal(editId) {
@@ -1449,7 +1458,7 @@ function editApplicant(id) { openAddModal(id); }
 async function deleteApplicant(id) {
   if (!confirm('Remove this applicant? This cannot be undone.')) return;
   STATE.applicants = STATE.applicants.filter(a => a.id !== id);
-  await saveApplicants();
+  await apiPost({ action: 'deleteApplicant', id });
   renderApplicantList();
 }
 
@@ -1471,6 +1480,7 @@ async function saveApplicant() {
   };
 
   if (STATE.editApplicantId) {
+    data.id = STATE.editApplicantId;
     const idx = STATE.applicants.findIndex(a => a.id === STATE.editApplicantId);
     if (idx !== -1) STATE.applicants[idx] = { ...STATE.applicants[idx], ...data };
   } else {
@@ -1478,7 +1488,7 @@ async function saveApplicant() {
     STATE.applicants.push(data);
   }
 
-  await saveApplicants();
+  await apiPost({ action: 'saveApplicant', applicant: data });
   document.getElementById('add-modal').classList.remove('open');
   renderApplicantList();
 }
@@ -1756,8 +1766,15 @@ async function saveReview(applicantId) {
   const uid = STATE.currentUser.id;
   const key = uid + ':' + applicantId;
   const notes = document.getElementById('reviewer-notes').value.trim();
-  STATE.reviews[key] = { rubric: { ...currentRubricScores }, notes, timestamp: new Date().toISOString() };
-  await saveReviews();
+  const reviewData = { rubric: { ...currentRubricScores }, notes, timestamp: new Date().toISOString() };
+  STATE.reviews[key] = reviewData;
+  await apiPost({
+    action: 'saveReview',
+    reviewerId: STATE.currentUser.id,
+    applicantId: applicantId,
+    rubric: currentRubricScores,
+    notes,
+  });
   const msg = document.getElementById('saved-msg');
   const btn = document.getElementById('rv-save-btn');
   btn.textContent = 'Update Score';
