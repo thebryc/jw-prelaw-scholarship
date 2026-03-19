@@ -1299,15 +1299,18 @@ async function initPortal() {
 }
 
 function showScreen(id) {
+  // Ensure portal is visible before trying to manipulate its children
+  document.getElementById('review-portal').style.display = 'block';
+  document.getElementById('public-site').style.display = 'none';
   document.querySelectorAll('#review-portal .screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
 function populateLoginSelect() {
   const sel = document.getElementById('login-select');
+  if (!sel) return;
   sel.innerHTML = '<option value="">— Select your name —</option>';
   if (STATE.reviewers.length === 0) {
-    // Fallback — hardcoded admin so portal is never completely locked out
     sel.innerHTML += '<option value="admin">Josh (Admin)</option>';
     STATE.reviewers = [{ id: 'admin', name: 'Josh', role: 'admin', password: 'admin2026' }];
   }
