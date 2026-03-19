@@ -503,11 +503,25 @@ textarea.field-input { resize: vertical; min-height: 160px; line-height: 1.7; }
 
   <hr class="divider">
 
+  <!-- Restrictions -->
+  <div class="pub-section">
+    <div class="section-label">Scholarship Restrictions</div>
+    <h2 class="section-title">Before You Apply</h2>
+    <ul class="elig-list">
+      <li class="elig-item"><div class="elig-dot" style="background:var(--teal);"></div><div>You must be in good standing with BRYC — meaning a minimum of 80% program attendance, or responsiveness to the Persistence Team's outreach.</div></li>
+      <li class="elig-item"><div class="elig-dot" style="background:var(--teal);"></div><div>You can only receive one BRYC scholarship per academic year. This includes the Albert Fraenkel Award for Alumni.</div></li>
+      <li class="elig-item"><div class="elig-dot" style="background:var(--teal);"></div><div>You cannot receive the same BRYC scholarship two years in a row.</div></li>
+      <li class="elig-item"><div class="elig-dot" style="background:var(--teal);"></div><div>You cannot receive the same BRYC scholarship more than twice.</div></li>
+    </ul>
+  </div>
+
+  <hr class="divider">
+
   <!-- Application Form -->
   <div id="application" class="form-wrap">
     <div id="form-content">
       <h2 class="form-title">Application</h2>
-      <p class="form-subtitle">Complete all required fields and submit your supporting documents by <strong>April 11, 2026 at 11:59 PM</strong>. Your application is not complete until BRYC receives your résumé and headshot.</p>
+      <p class="form-subtitle">Complete all required fields and upload your supporting documents by <strong>April 11, 2026 at 11:59 PM</strong>.</p>
 
       <form id="app-form" novalidate>
 
@@ -542,8 +556,8 @@ textarea.field-input { resize: vertical; min-height: 160px; line-height: 1.7; }
         </div>
 
         <div class="field-group">
-          <label class="field-label">Instagram Handle <span class="req">*</span></label>
-          <input class="field-input" type="text" name="instagram" placeholder="@username" required>
+          <label class="field-label">Instagram Handle</label>
+          <input class="field-input" type="text" name="instagram" placeholder="@username">
         </div>
 
         <!-- Applicant Type -->
@@ -698,27 +712,16 @@ textarea.field-input { resize: vertical; min-height: 160px; line-height: 1.7; }
           </div>
         </div>
 
-        <div class="docs-box">
-          <strong>Supporting Documents</strong>
-          <p style="margin:8px 0 4px;">Please email your <strong>résumé (PDF only)</strong> and a <strong>high-resolution headshot</strong> to <a href="mailto:alyson@thebryc.org">alyson@thebryc.org</a>.</p>
-          <ul>
-            <li>Subject line: <em>Jones Walker Scholarship Attachments</em></li>
-            <li>Your application is not complete until these documents are received.</li>
-          </ul>
+        <div class="field-group">
+          <label class="field-label">Résumé <span class="req">*</span></label>
+          <div class="field-hint">PDF only. Max 5MB.</div>
+          <input class="field-input" type="file" name="resume" id="resume" accept=".pdf" required style="padding:8px 14px;cursor:pointer;">
         </div>
 
         <div class="field-group">
-          <label class="checkbox-opt">
-            <input type="checkbox" name="docsSent" id="docsSent" required>
-            <span>I have emailed my résumé and headshot to <a href="mailto:alyson@thebryc.org">alyson@thebryc.org</a>. <span class="req">*</span></span>
-          </label>
-        </div>
-
-        <div class="field-group">
-          <label class="checkbox-opt">
-            <input type="checkbox" name="understand" id="understand" required>
-            <span>I understand that my application will not be considered complete until BRYC receives my supporting documents. <span class="req">*</span></span>
-          </label>
+          <label class="field-label">Headshot <span class="req">*</span></label>
+          <div class="field-hint">High-resolution photo. JPG or PNG. Max 5MB.</div>
+          <input class="field-input" type="file" name="headshot" id="headshot" accept=".jpg,.jpeg,.png" required style="padding:8px 14px;cursor:pointer;">
         </div>
 
         <div class="form-error" id="form-error">Please complete all required fields before submitting.</div>
@@ -1060,7 +1063,8 @@ document.getElementById('app-form').addEventListener('submit', async function(e)
   if (!essay) { err.textContent = 'Please complete the essay field.'; err.style.display = 'block'; return; }
   const wordCount = essay.split(/\s+/).filter(Boolean).length;
   if (wordCount > 500) { err.textContent = 'Your essay exceeds 500 words. Please trim it before submitting.'; err.style.display = 'block'; return; }
-  if (!form.docsSent.checked || !form.understand.checked) { err.textContent = 'Please confirm you have sent your supporting documents and understand the requirements.'; err.style.display = 'block'; return; }
+  if (!form.resume.files.length) { err.textContent = 'Please upload your résumé before submitting.'; err.style.display = 'block'; return; }
+  if (!form.headshot.files.length) { err.textContent = 'Please upload your headshot before submitting.'; err.style.display = 'block'; return; }
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true;
@@ -1069,40 +1073,39 @@ document.getElementById('app-form').addEventListener('submit', async function(e)
   // Build form data for Formspree
   const FORMSPREE_URL = 'https://formspree.io/f/mpqybbwe';
 
-  const data = {
-    firstName: form.firstName.value.trim(),
-    middleName: form.middleName.value.trim(),
-    lastName: form.lastName.value.trim(),
-    phone: form.phone.value.trim(),
-    email: form.email.value.trim(),
-    instagram: form.instagram.value.trim(),
-    applicantType: type.value,
-    legalArea: form.legalArea.value,
-    lawSchool: lawChoice.value,
-    lawCareerAlt: form.lawCareerAlt ? form.lawCareerAlt.value.trim() : '',
-    essay: essay,
-    gradDate: form.gradDate.value,
-    otherEvent: form.otherEvent.value,
-    // HS fields
-    hsName: (form.hsName ? form.hsName.value.trim() : ''),
-    hsGradYear: (form.hsGradYear ? form.hsGradYear.value : ''),
-    intendedCollege: (form.intendedCollege ? form.intendedCollege.value.trim() : ''),
-    intendedMajor: (form.intendedMajor ? form.intendedMajor.value.trim() : ''),
-    // Alumni fields
-    hsNameAlumni: (form.hsNameAlumni ? form.hsNameAlumni.value.trim() : ''),
-    hsGradYearAlumni: (form.hsGradYearAlumni ? form.hsGradYearAlumni.value : ''),
-    collegeName: (form.collegeName ? form.collegeName.value.trim() : ''),
-    collegeGradYear: (form.collegeGradYear ? form.collegeGradYear.value.trim() : ''),
-    major: (form.major ? form.major.value.trim() : ''),
-    currentEnrollment: (form.currentEnrollment ? form.currentEnrollment.value.trim() : ''),
-    _subject: 'Jones Walker Pre-Law Scholarship Application — ' + form.firstName.value.trim() + ' ' + form.lastName.value.trim(),
-  };
+  const data = new FormData();
+  data.append('firstName', form.firstName.value.trim());
+  data.append('middleName', form.middleName.value.trim());
+  data.append('lastName', form.lastName.value.trim());
+  data.append('phone', form.phone.value.trim());
+  data.append('email', form.email.value.trim());
+  data.append('instagram', form.instagram.value.trim());
+  data.append('applicantType', type.value);
+  data.append('legalArea', form.legalArea.value);
+  data.append('lawSchool', lawChoice.value);
+  data.append('lawCareerAlt', form.lawCareerAlt ? form.lawCareerAlt.value.trim() : '');
+  data.append('essay', essay);
+  data.append('gradDate', form.gradDate.value);
+  data.append('otherEvent', form.otherEvent.value);
+  data.append('hsName', form.hsName ? form.hsName.value.trim() : '');
+  data.append('hsGradYear', form.hsGradYear ? form.hsGradYear.value : '');
+  data.append('intendedCollege', form.intendedCollege ? form.intendedCollege.value.trim() : '');
+  data.append('intendedMajor', form.intendedMajor ? form.intendedMajor.value.trim() : '');
+  data.append('hsNameAlumni', form.hsNameAlumni ? form.hsNameAlumni.value.trim() : '');
+  data.append('hsGradYearAlumni', form.hsGradYearAlumni ? form.hsGradYearAlumni.value : '');
+  data.append('collegeName', form.collegeName ? form.collegeName.value.trim() : '');
+  data.append('collegeGradYear', form.collegeGradYear ? form.collegeGradYear.value.trim() : '');
+  data.append('major', form.major ? form.major.value.trim() : '');
+  data.append('currentEnrollment', form.currentEnrollment ? form.currentEnrollment.value.trim() : '');
+  data.append('_subject', 'Jones Walker Pre-Law Scholarship Application — ' + form.firstName.value.trim() + ' ' + form.lastName.value.trim());
+  if (form.resume.files[0]) data.append('resume', form.resume.files[0]);
+  if (form.headshot.files[0]) data.append('headshot', form.headshot.files[0]);
 
   try {
     const res = await fetch(FORMSPREE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(data),
+      headers: { 'Accept': 'application/json' },
+      body: data,
     });
     if (res.ok) {
       document.getElementById('form-content').style.display = 'none';
