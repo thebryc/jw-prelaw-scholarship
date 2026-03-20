@@ -402,6 +402,38 @@ textarea.field-input { resize: vertical; min-height: 160px; line-height: 1.7; }
 .role-badge { font-size: 10px; padding: 3px 10px; border-radius: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 .role-badge.admin { background: var(--navy); color: #fff; }
 .role-badge.reviewer { background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+
+  /* ── COMMS PORTAL ── */
+  :root {
+    --comms-internal: #fcc42b;
+    --comms-internal-bg: #fff8e1;
+    --comms-senior: #2a6465;
+    --comms-senior-bg: #eef4f4;
+    --comms-cfa: #282561;
+    --comms-cfa-bg: #eeedf6;
+  }
+  #comms-portal { display: none; min-height: 100vh; background: #e8ecec; }
+  #comms-login { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #e8ecec; }
+  #comms-content { display: none; max-width: 780px; margin: 0 auto; padding: 48px 2rem 80px; }
+  .comms-header { background: var(--teal); padding: 0 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(42,100,101,0.15); }
+  .comms-header-inner { max-width: 780px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .comms-header-title { color: #ffffff; font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+  .comm-card { background: var(--white); border: 1px solid #c8d4d4; border-radius: 12px; margin-bottom: 24px; overflow: hidden; box-shadow: 0 2px 8px rgba(42,100,101,0.06); }
+  .comm-card-header { padding: 16px 24px; background: var(--teal); display: flex; align-items: center; justify-content: space-between; }
+  .comm-card-title { font-size: 14px; font-weight: 800; color: #fff; }
+  .comm-card-tag { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: 700; background: rgba(255,255,255,0.12); padding: 3px 8px; border-radius: 8px; }
+  .comm-card-body { padding: 24px; color: #515151; }
+  .comm-variant { margin-bottom: 20px; }
+  .comm-variant:last-child { margin-bottom: 0; }
+  .comm-variant-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; color: var(--teal); margin-bottom: 10px; }
+  .comm-subject { font-size: 12px; color: #515151; margin-bottom: 10px; font-style: italic; background: #f0f5f5; padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--teal); }
+  .comm-text { font-size: 14px; line-height: 1.8; color: #515151; white-space: pre-wrap; background: #f7fafa; border: 1px solid #c8d4d4; border-radius: 8px; padding: 16px; }
+  .comm-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .comm-btn { padding: 7px 16px; border: 1px solid var(--teal); border-radius: 6px; font-size: 12px; font-weight: 700; color: var(--teal); background: none; cursor: pointer; transition: all 0.15s; }
+  .comm-btn:hover { background: var(--teal); color: #fff; }
+  .comm-btn.copied { background: var(--teal); color: #fff; }
+  .comms-section-title { font-size: 13px; font-weight: 800; color: var(--teal); margin: 36px 0 16px; padding: 8px 14px; background: rgba(42,100,101,0.08); border-radius: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  .comms-section-title:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
@@ -445,7 +477,7 @@ textarea.field-input { resize: vertical; min-height: 160px; line-height: 1.7; }
 </svg>
         <span>Baton Rouge Youth Coalition</span>
       </div>
-      <a href="#" class="committee-link" onclick="showPortal(); return false;">Committee Login →</a>
+      <a href="#" class="committee-link" onclick="showCommsPortal(); return false;" style="margin-right:8px;">Comms</a><a href="#" class="committee-link" onclick="showPortal(); return false;">Committee Login →</a>
     </div>
   </header>
 
@@ -740,7 +772,7 @@ Thank you for applying to the Jones Walker Pre-Law Scholarship. Your application
   </div>
 
   <footer class="pub-footer">
-    © 2026 Baton Rouge Youth Coalition · <a href="https://thebryc.org" style="color:rgba(255,255,255,0.5)">thebryc.org</a>
+    © 2026 Baton Rouge Youth Coalition · <a href="https://thebryc.org/jw" style="color:rgba(255,255,255,0.5)">thebryc.org/jw</a>
   </footer>
 </div>
 
@@ -1824,6 +1856,306 @@ function closeModal(id, e) {
   if (e && e.target !== document.getElementById(id)) return;
   document.getElementById(id).classList.remove('open');
 }
+// ============================================================
+// COMMS PORTAL
+// ============================================================
+
+function showCommsPortal() {
+  document.getElementById('public-site').style.display = 'none';
+  document.getElementById('review-portal').style.display = 'none';
+  document.getElementById('comms-portal').style.display = 'block';
+  document.getElementById('comms-login').style.display = 'flex';
+  document.getElementById('comms-content').style.display = 'none';
+  document.getElementById('comms-pw').value = '';
+  document.getElementById('comms-error').style.display = 'none';
+}
+
+function hideCommsPortal() {
+  document.getElementById('comms-portal').style.display = 'none';
+  document.getElementById('public-site').style.display = 'block';
+}
+
+function doCommsLogin() {
+  const pw = document.getElementById('comms-pw').value;
+  if (pw === 'jwcomms') {
+    document.getElementById('comms-login').style.display = 'none';
+    document.getElementById('comms-content').style.display = 'block';
+    document.getElementById('comms-error').style.display = 'none';
+  } else {
+    document.getElementById('comms-error').style.display = 'block';
+  }
+}
+
+function copyComm(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function downloadComm(id, filename) {
+  const text = document.getElementById(id).innerText;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename + '.txt';
+  a.click();
+}
 </script>
+
+<!-- ============================================================
+     COMMS PORTAL
+     ============================================================ -->
+<div id="comms-portal">
+  <div class="comms-header">
+    <div class="comms-header-inner">
+      <span class="comms-header-title">Jones Walker Pre-Law — Communications</span>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn-outline" style="font-size:11px;padding:5px 12px;color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);" onclick="hideCommsPortal()">← Back to site</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div id="comms-login">
+    <div class="login-box">
+      <div class="login-title">
+        <h1>Communications Portal</h1>
+        <p>Jones Walker Pre-Law Scholarship</p>
+      </div>
+      <div class="portal-field-group">
+        <label class="portal-field-label">Password</label>
+        <input class="portal-input" type="password" id="comms-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doCommsLogin()">
+      </div>
+      <div class="login-error" id="comms-error" style="display:none;">Incorrect password.</div>
+      <button class="btn-primary" style="width:100%;padding:13px;margin-top:8px;font-size:14px;" onclick="doCommsLogin()">Enter</button>
+      <div class="portal-back-link"><a href="#" onclick="hideCommsPortal(); return false;">← Back to scholarship page</a></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div id="comms-content">
+
+    <div class="comms-section-title" style="background:var(--comms-internal-bg);color:#a07000;border-left:4px solid var(--comms-internal);">Reviewer Invitations — Internal</div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-internal);">
+        <span class="comm-card-title" style="color:#333;">Previous Winner / Alumni Reviewer</span>
+        <span class="comm-card-tag" style="color:rgba(0,0,0,0.5);">Email</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-subject">Subject: Will you help select this year's Jones Walker Pre-Law Scholarship recipients?</div>
+          <div class="comm-text" id="comm-reviewer-alumni">Hi [Name],
+
+As a Jones Walker Pre-Law Scholarship recipient yourself, you know what this award means — and we'd love your perspective on this year's applicants.
+
+We're assembling a small review committee to evaluate essays and select four recipients (one high school senior at $1,000 and three alumni at $3,000 each). The process is straightforward: you'll log into a simple review portal, read through your assigned applicants' essays, and score each one using a rubric. It should take no more than an hour or two, and you can do it on your own schedule before [DEADLINE].
+
+Would you be willing to serve on the committee? I'd love to have your voice in this.
+
+Alyson Breaux
+Baton Rouge Youth Coalition</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-reviewer-alumni', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-reviewer-alumni', 'reviewer-invite-alumni')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-internal);">
+        <span class="comm-card-title" style="color:#333;">Jones Walker Contact (Fran / Lauren)</span>
+        <span class="comm-card-tag">Email</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-subject">Subject: Jones Walker Pre-Law Scholarship — Reviewer Invitation</div>
+          <div class="comm-text" id="comm-reviewer-jw">Hi [Name],
+
+Thank you again for Jones Walker's partnership on the Pre-Law Scholarship — we're excited to announce this award to our Fellows and alumni for the first time.
+
+We're putting together a small review committee and would love to include a Jones Walker representative. Your perspective on what makes a strong candidate for a legal career would be invaluable to our process.
+
+Here's what it involves: you'd log into a secure online review portal, read a small number of applicant essays, and score each one using a structured rubric. We estimate it'll take no more than an hour or two, and you can complete it on your own schedule before [DEADLINE].
+
+Would you or someone from your team be available to participate? Happy to answer any questions.
+
+Alyson Breaux
+Baton Rouge Youth Coalition</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-reviewer-jw', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-reviewer-jw', 'reviewer-invite-jones-walker')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-internal);">
+        <span class="comm-card-title" style="color:#333;">Internal BRYC Team Member</span>
+        <span class="comm-card-tag">Email</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-subject">Subject: Can you join the Jones Walker Pre-Law Scholarship review committee?</div>
+          <div class="comm-text" id="comm-reviewer-internal">Hi [Name],
+
+We're standing up the review committee for the Jones Walker Pre-Law Scholarship and I'd love to have you involved.
+
+Four awards are on the table — one $1,000 award for a high school senior and three $3,000 awards for alumni. You'd log into our review portal, read through a handful of essays, score them using our rubric, and that's it. Shouldn't take more than an hour or two on your own time before [DEADLINE].
+
+Let me know if you're in and I'll send you your login.
+
+Alyson</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-reviewer-internal', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-reviewer-internal', 'reviewer-invite-internal')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comms-section-title" style="background:var(--comms-cfa-bg);color:var(--comms-cfa);border-left:4px solid var(--comms-cfa);">CFA Announcement</div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-cfa);">
+        <span class="comm-card-title">CFA Announcement</span>
+        <span class="comm-card-tag">MailChimp — Alexis sends</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-subject">Subject: Apply Now — Jones Walker Pre-Law Scholarship (Deadline April 11)</div>
+          <div class="comm-text" id="comm-cfa">The Jones Walker Pre-Law Scholarship is now accepting applications.
+
+Made possible by Jones Walker LLP — one of the largest law firms in the South — this scholarship supports BRYC Fellows and alumni who are pursuing careers in the legal field. That includes law school, but also paralegal studies, criminal justice, public policy, civil rights, and more.
+
+This year, four awards are available:
+
+• 1 award of $1,000 for a current high school senior (must be planning to enroll in college this fall)
+• 3 awards of $3,000 each for BRYC alumni
+
+To be eligible, you must be a current Fellow or BRYC alumni, be actively enrolled or planning to enroll in a postsecondary institution, and be in good standing with BRYC.
+
+Applications are due Saturday, April 11, 2026.
+
+Apply now: thebryc.org/jw</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-cfa', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-cfa', 'cfa-announcement')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-cfa);">
+        <span class="comm-card-title">Targeted Text / DM to Alumni</span>
+        <span class="comm-card-tag">Text / DM — Alexis sends to targeted individuals</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-text" id="comm-alumni-text">Hey [Name]! BRYC has a scholarship for alumni interested in law, criminal justice, public policy — basically any legal career path. There are 3 awards of $3,000 each and the application is just a short form + essay. Deadline is April 11. Apply here: thebryc.org/jw — let me know if you have questions!</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-alumni-text', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-alumni-text', 'alumni-text-outreach')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comms-section-title" style="background:var(--comms-senior-bg);color:var(--comms-senior);border-left:4px solid var(--comms-senior);">Senior Team Talking Points — Internal</div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-senior);">
+        <span class="comm-card-title">Senior Team Talking Points</span>
+        <span class="comm-card-tag">Internal — Do Not Share</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-text" id="comm-senior-team">JONES WALKER PRE-LAW SCHOLARSHIP — SENIOR TEAM TALKING POINTS (INTERNAL)
+
+This scholarship has been part of BRYC's partnership with Jones Walker for six years — but it's new for seniors. This is the first year we're opening it up beyond alumni, so seniors may not know it exists.
+
+WHAT TO SAY TO SENIORS:
+
+"There's a scholarship available this year specifically for BRYC Fellows interested in the legal field — and that's broader than you might think. You don't have to want to be a lawyer. Paralegals, criminal investigators, judges, public defenders, policy analysts, court reporters — all of that counts. If you're interested in law or justice in any form, this is for you.
+
+It's a $1,000 award, and to be eligible you need to be planning to enroll in college this fall. The application is just a form and a 500-word essay about your career aspirations. The deadline is April 11.
+
+Apply at thebryc.org/jw"
+
+GOOD CANDIDATES TO FLAG:
+• Students in mock trial, debate, or government/civics courses
+• Students who've mentioned interest in criminal justice, social justice, or advocacy
+• Students considering pre-law majors or political science
+• Students interested in any aspect of the legal system, even if they haven't named it as a career yet
+
+RESTRICTION TO FLAG:
+Students can only receive one BRYC scholarship per academic year. If they've already received another BRYC scholarship this year, they're not eligible.</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-senior-team', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-senior-team', 'senior-team-talking-points')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comms-section-title" style="background:var(--comms-senior-bg);color:var(--comms-senior);border-left:4px solid var(--comms-senior);">Senior Fellows — Direct Outreach</div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-senior);">
+        <span class="comm-card-title">Targeted Text / DM to Seniors</span>
+        <span class="comm-card-tag">Text / DM — Senior team sends to targeted individuals</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-text" id="comm-senior-text">Hey [Name]! BRYC has a scholarship this year for students interested in law, criminal justice, public policy — basically any legal career path. It's $1,000 for one senior and the application is just a short form + essay. Deadline is April 11. Apply here: thebryc.org/jw — let me know if you have questions!</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-senior-text', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-senior-text', 'senior-targeted-text')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comm-card">
+      <div class="comm-card-header" style="background:var(--comms-senior);">
+        <span class="comm-card-title">What to Tell Senior Fellows</span>
+        <span class="comm-card-tag">Email — Senior team sends to targeted individuals</span>
+      </div>
+      <div class="comm-card-body">
+        <div class="comm-variant">
+          <div class="comm-text" id="comm-senior-fellows">BRYC and Jones Walker have partnered for six years to support students pursuing careers in the legal field — and this year, for the first time, that includes you.
+
+The Jones Walker Pre-Law Scholarship is a $1,000 award for one BRYC senior who is planning to enroll in college this fall and is interested in a career in law or justice. That includes:
+
+• Becoming a lawyer or judge
+• Paralegal or legal assistant work
+• Criminal justice and law enforcement
+• Public policy and government
+• Civil rights and social justice advocacy
+• And more
+
+The application is simple: a short form and a 500-word essay about your career aspirations. You'll also need to upload your résumé and a headshot.
+
+Deadline: Saturday, April 11, 2026
+Apply at: thebryc.org/jw
+
+Questions? Reach out to Ms. Alyson at alyson@thebryc.org.</div>
+          <div class="comm-actions">
+            <button class="comm-btn" onclick="copyComm('comm-senior-fellows', this)">Copy</button>
+            <button class="comm-btn" onclick="downloadComm('comm-senior-fellows', 'senior-fellows-email')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #comms-content -->
+</div><!-- #comms-portal -->
+
 </body>
 </html>
